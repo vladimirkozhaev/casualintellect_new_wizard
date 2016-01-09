@@ -3,7 +3,20 @@
  */
 package org.casualintellect.validation;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+import org.casualintellect.casualIntellect.CasualIntellectPackage;
+import org.casualintellect.casualIntellect.Model;
+import org.casualintellect.casualIntellect.Transition;
+import org.casualintellect.casualIntellect.Transitions;
 import org.casualintellect.validation.AbstractCasualIntellectValidator;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.xtext.validation.Check;
+import org.eclipse.xtext.xbase.lib.Conversions;
+import org.eclipse.xtext.xbase.lib.Functions.Function1;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 
 /**
  * This class contains custom validation rules.
@@ -12,7 +25,52 @@ import org.casualintellect.validation.AbstractCasualIntellectValidator;
  */
 @SuppressWarnings("all")
 public class CasualIntellectValidator extends AbstractCasualIntellectValidator {
-  public Object checkTransitions() {
-    return null;
+  @Check
+  public void checkTransitions(final Model model) {
+    EList<org.casualintellect.casualIntellect.State> states = model.getList_of_states();
+    LinkedList<String> listOfStateNames = new LinkedList<String>();
+    for (int i = 0; (i < ((Object[])Conversions.unwrapArray(states, Object.class)).length); i++) {
+      {
+        org.casualintellect.casualIntellect.State state = states.get(i);
+        String _name = state.getName();
+        listOfStateNames.add(_name);
+      }
+    }
+    for (int i = 0; (i < ((Object[])Conversions.unwrapArray(listOfStateNames, Object.class)).length); i++) {
+      {
+        final String name = listOfStateNames.get(i);
+        final Function1<String, Boolean> _function = (String it) -> {
+          return Boolean.valueOf(it.equals(name));
+        };
+        Iterable<String> list = IterableExtensions.<String>filter(listOfStateNames, _function);
+        int _size = IterableExtensions.size(list);
+        boolean _greaterThan = (_size > 1);
+        if (_greaterThan) {
+          EAttribute _state_Name = CasualIntellectPackage.eINSTANCE.getState_Name();
+          this.warning(("There are several states with the same name:" + name), CasualIntellectPackage.Literals.STATE, _state_Name);
+        }
+      }
+    }
+    for (int i = 0; (i < ((Object[])Conversions.unwrapArray(states, Object.class)).length); i++) {
+      {
+        final org.casualintellect.casualIntellect.State state = states.get(i);
+        Transitions _transitions = state.getTransitions();
+        final EList<Transition> transitionsList = _transitions.getList();
+        final Consumer<Transition> _function = (Transition transition) -> {
+        };
+        transitionsList.forEach(_function);
+      }
+    }
+  }
+  
+  public void checkTransition(final Transition transition, final List<String> stateNamesList) {
+    String _name = transition.getName();
+    boolean _contains = stateNamesList.contains(_name);
+    if (_contains) {
+      String _name_1 = transition.getName();
+      String _plus = ("No state for transition " + _name_1);
+      EAttribute _state_Name = CasualIntellectPackage.eINSTANCE.getState_Name();
+      this.warning(_plus, CasualIntellectPackage.Literals.STATE, _state_Name);
+    }
   }
 }

@@ -3,27 +3,54 @@
  */
 package org.casualintellect.validation
 
+import java.util.LinkedList
+import java.util.List
+import org.casualintellect.casualIntellect.CasualIntellectPackage
+import org.casualintellect.casualIntellect.Model
+import org.casualintellect.casualIntellect.Transition
+import org.eclipse.xtext.validation.Check
 
 /**
  * This class contains custom validation rules. 
- *
+ * 
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 class CasualIntellectValidator extends AbstractCasualIntellectValidator {
-	
-//  public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					CasualIntellectPackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
 
-	def checkTransitions(){
+	@Check
+	def checkTransitions(Model model) {
+		var states = model.list_of_states;
+		var listOfStateNames = new LinkedList<String>();
+		for (var i = 0; i < states.length; i++) {
+			var state = states.get(i);
+			listOfStateNames.add(state.name);
+		}
+
+		for (var i = 0; i < listOfStateNames.length; i++) {
+			val name = listOfStateNames.get(i);
+			var list = listOfStateNames.filter[equals(name)]
+
+			if (list.size > 1) {
+				warning('There are several states with the same name:' + name, CasualIntellectPackage.Literals.STATE,
+					CasualIntellectPackage::eINSTANCE.state_Name)
+			}
+
+		}
 		
+		for (var i = 0; i < states.length; i++) {
+			val state=states.get(i);
+			val transitionsList=state.transitions.list;
+			
+			transitionsList.forEach[transition|]
+			
+		}
 	}
 	
+	def checkTransition(Transition transition,List<String> stateNamesList){
+		if (stateNamesList.contains(transition.name)){
+			warning('No state for transition ' + transition.name, CasualIntellectPackage.Literals.STATE,
+					CasualIntellectPackage::eINSTANCE.state_Name)
+		}
+	}
+
 }

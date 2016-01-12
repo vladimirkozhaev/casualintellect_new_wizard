@@ -8,6 +8,7 @@ import java.util.List
 import org.casualintellect.casualIntellect.CasualIntellectPackage
 import org.casualintellect.casualIntellect.Model
 import org.casualintellect.casualIntellect.Transition
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.validation.Check
 
 /**
@@ -20,37 +21,45 @@ class CasualIntellectValidator extends AbstractCasualIntellectValidator {
 	@Check
 	def checkTransitions(Model model) {
 		var states = model.list_of_states;
-		var listOfStateNames = new LinkedList<String>();
+		val listOfStateNames = new LinkedList<String>();
 		for (var i = 0; i < states.length; i++) {
 			var state = states.get(i);
 			listOfStateNames.add(state.name);
 		}
 
-		for (var i = 0; i < listOfStateNames.length; i++) {
-			val name = listOfStateNames.get(i);
+		for (var i = 0; i < states.length; i++) {
+			val state = states.get(i);
+			val name = state.name;
 			var list = listOfStateNames.filter[equals(name)]
 
 			if (list.size > 1) {
-				warning('There are several states with the same name:' + name, CasualIntellectPackage.Literals.STATE,
+				error('There are several states with the same name:' + name, CasualIntellectPackage.Literals.STATE,
 					CasualIntellectPackage::eINSTANCE.state_Name)
 			}
 
 		}
-		
+
 		for (var i = 0; i < states.length; i++) {
-			val state=states.get(i);
-			val transitionsList=state.transitions.list;
-			
-			transitionsList.forEach[transition|]
-			
+			val state = states.get(i);
+			val transitionsList = state.transitions.list;
+
+			transitionsList.forEach[transition|checkTransition(state, transition, listOfStateNames)]
+
 		}
 	}
-	
-	def checkTransition(Transition transition,List<String> stateNamesList){
-		if (stateNamesList.contains(transition.name)){
-			warning('No state for transition ' + transition.name, CasualIntellectPackage.Literals.STATE,
-					CasualIntellectPackage::eINSTANCE.state_Name)
+
+	def checkTransition(EObject state, Transition transition, List<String> stateNamesList) {
+		if (!stateNamesList.contains(transition.name)) {
+			val index = foundIndex(transition);
+			error('No state for transition ' + transition.name, state, CasualIntellectPackage::eINSTANCE.state_Name,
+				index)
 		}
+	}
+
+	def foundIndex(EObject object) {
+		val container = object.eContainer;
+		var index = container.eContents.indexOf(object);
+		index;
 	}
 
 }

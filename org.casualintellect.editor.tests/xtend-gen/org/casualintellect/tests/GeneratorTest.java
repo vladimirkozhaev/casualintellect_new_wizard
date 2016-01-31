@@ -1,7 +1,6 @@
 package org.casualintellect.tests;
 
 import com.google.inject.Inject;
-import org.casualintellect.tests.CasualIntellectInjectorProvider;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.junit4.InjectWith;
 import org.eclipse.xtext.junit4.XtextRunner;
@@ -12,8 +11,8 @@ import org.eclipse.xtext.xbase.lib.util.ReflectExtensions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(XtextRunner.class)
-@InjectWith(CasualIntellectInjectorProvider.class)
+@RunWith(XtextRunner.class)/* 
+@InjectWith(CasualIntellectInjectorProvider.class) */
 @SuppressWarnings("all")
 public class GeneratorTest {
   @Inject

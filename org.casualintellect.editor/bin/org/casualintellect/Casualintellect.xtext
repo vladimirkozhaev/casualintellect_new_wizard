@@ -1,0 +1,41 @@
+grammar org.casualintellect.CasualIntellect with org.eclipse.xtext.common.Terminals
+
+generate casualIntellect "http://www.casualintellect.org/CasualIntellect"
+
+Model:
+	list_of_states+=State+;
+
+State:
+	'state' name=ID '{' before=ProcessBeforeState after=ProcessAfterState? inProcess=ProcessInState transitions=Transitions? '}';
+
+Transitions:
+	'transitions' ':' '{' list+=Transition? (',' list+=Transition)* '}';
+
+Transition:
+	'transition' ':' name=ID ';' 'condition' ':' condition=Expression  (';' 'methods' ':' methods+= ID (',' methods+=ID)*)?;
+
+ProcessInState:
+	'in_process' ':' methods+=ID? (',' methods+=ID)* ';';
+
+ProcessAfterState:
+	'after' ':' methods+=ID? (',' methods+=ID)* ';'; 
+
+ProcessBeforeState:
+	'before' ':' methods+=ID? (',' methods+=ID)* ';';
+
+Expression:	Or;
+
+Or returns Expression:
+	And ({Or.left=current} "||" right=And)*;
+
+And returns Expression:
+	Primary ({And.left=current} "&&" right=Primary)*;
+
+Primary returns Expression:
+	{NestedExpression} '(' child=Expression ')' |
+	{Not} "!" expression=Primary |
+	Atomic;
+
+Atomic returns Expression:
+	{StringConstant} value=ID |
+	{BoolConstant} value=('true' | 'false');

@@ -4,8 +4,6 @@
 package org.casualintellect.tests;
 
 import com.google.inject.Inject;
-import org.casualintellect.casualIntellect.Model;
-import org.casualintellect.tests.CasualIntellectInjectorProvider;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.junit4.InjectWith;
 import org.eclipse.xtext.junit4.XtextRunner;
@@ -15,12 +13,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(XtextRunner.class)
-@InjectWith(CasualIntellectInjectorProvider.class)
+@RunWith(XtextRunner.class)/* 
+@InjectWith(/* name is null */) */
 @SuppressWarnings("all")
 public class CasualIntellectParsingTest {
   @Inject
-  private ParseHelper<Model> parseHelper;
+  private /* ParseHelper<Model> */Object parseHelper;
   
   @Test
   public void loadModel() {

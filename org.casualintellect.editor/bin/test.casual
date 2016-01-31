@@ -1,0 +1,9 @@
+state state1 {
+	before: salo, pivo, vodka;
+	after:salo,pivo,vodka;
+	in_process:pivo, vodka, salo;
+	transitions :
+	{
+		transition:state1; condition:f1 || f2&&f3
+	}
+}
